@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Rock Paper Scissors - PWA Game</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" id="app-manifest">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --neon-blue: #00d9ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff9d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 3px solid var(--neon-blue);
+            position: relative;
+        }
+        
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink), var(--neon-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+            letter-spacing: 2px;
+        }
+        
+        .game-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        /* Score Board */
+        .score-board {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-board::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink), var(--neon-green));
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .score-box {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .score-box.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+            border: 2px solid var(--secondary);
+        }
+        
+        .player-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+        }
+        
+        /* Game Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .choice-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: none;
+            font-size: 4rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-10px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .choice-btn.rock {
+            border: 3px solid var(--primary);
+        }
+        
+        .choice-btn.paper {
+            border: 3px solid var(--warning);
+        }
+        
+        .choice-btn.scissors {
+            border: 3px solid var(--danger);
+        }
+        
+        .choice-btn.rock:hover {
+            box-shadow: 0 0 25px rgba(52, 152, 219, 0.7);
+        }
+        
+        .choice-btn.paper:hover {
+            box-shadow: 0 0 25px rgba(243, 156, 18, 0.7);
+        }
+        
+        .choice-btn.scissors:hover {
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.7);
+        }
+        
+        .choice-label {
+            position: absolute;
+            bottom: -25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
+        }
+        
+        /* Game Results */
+        .game-results {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            text-align: center;
+        }
+        
+        .choices-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .choice-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            width: 180px;
+        }
+        
+        .choice-icon {
+            font-size: 5rem;
+            margin-bottom: 10px;
+        }
+        
+        .vs-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.7);
+        }
+        
+        .result-text {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 20px 0;
+            min-height: 60px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .win {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.7);
+        }
+        
+        .lose {
+            color: var(--danger);
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+        }
+        
+        .draw {
+            color: var(--warning);
+            text-shadow: 0 0 10px rgba(243, 156, 18, 0.7);
+        }
+        
+        /* Game History */
+        .game-history {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .history-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .history-list {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .history-item.win {
+            border-left: 5px solid var(--secondary);
+        }
+        
+        .history-item.lose {
+            border-left: 5px solid var(--danger);
+        }
+        
+        .history-item.draw {
+            border-left: 5px solid var(--warning);
+        }
+        
+        /* Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-custom {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(to right, var(--primary), var(--neon-blue));
+            color: white;
+        }
+        
+        .btn-success-custom {
+            background: linear-gradient(to right, var(--secondary), var(--neon-green));
+            color: white;
+        }
+        
+        .btn-danger-custom {
+            background: linear-gradient(to right, var(--danger), #ff6b6b);
+            color: white;
+        }
+        
+        .btn-warning-custom {
+            background: linear-gradient(to right, var(--warning), #ffd93d);
+            color: white;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Install PWA Button */
+        #installButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: none;
+        }
+        
+        /* Footer */
+        .game-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px rgba(0, 217, 255, 0.7); }
+            50% { box-shadow: 0 0 25px rgba(0, 217, 255, 0.9); }
+            100% { box-shadow: 0 0 10px rgba(0, 217, 255, 0.7); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        .glow {
+            animation: glow 1.5s infinite;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .choice-btn {
+                width: 110px;
+                height: 110px;
+                font-size: 3rem;
+            }
+            
+            .choices-display {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .score-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .score-box {
+                min-width: 100%;
+            }
+        }
+        
+        /* PWA Install Instructions */
+        .pwa-install-info {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(44, 62, 80, 0.95);
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .pwa-install-info.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- PWA Install Instructions -->
+        <div class="pwa-install-info" id="pwaInstallInfo">
+            <p>Install this game as an app! Look for the <i class="fas fa-download"></i> icon in your browser's address bar or menu.</p>
+            <button class="btn btn-sm btn-success-custom" onclick="hidePWAInfo()">Got it!</button>
+        </div>
+        
+        <!-- Header -->
+        <header class="game-header">
+            <h1 class="game-title">ROCK PAPER SCISSORS</h1>
+            <p class="game-subtitle">The Ultimate Showdown - Play against the computer in this classic game</p>
+            <div class="action-buttons">
+                <button class="btn btn-primary-custom btn-custom" id="rulesBtn">
+                    <i class="fas fa-info-circle"></i> How to Play
+                </button>
+                <button class="btn btn-warning-custom btn-custom" id="soundToggle">
+                    <i class="fas fa-volume-up"></i> Sound: ON
+                </button>
+            </div>
+        </header>
+        
+        <!-- Score Board -->
+        <section class="score-board">
+            <div class="score-container">
+                <div class="score-box active" id="playerScoreBox">
+                    <div class="player-name">YOU</div>
+                    <div class="score" id="playerScore">0</div>
+                    <div class="player-label">Player</div>
+                </div>
+                <div class="vs-text">VS</div>
+                <div class="score-box" id="computerScoreBox">
+                    <div class="player-name">COMPUTER</div>
+                    <div class="score" id="computerScore">0</div>
+                    <div class="player-label">Computer</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Game Controls -->
+        <section class="game-controls">
+            <button class="choice-btn rock" id="rockBtn" data-choice="rock">
+                <i class="fas fa-hand-rock"></i>
+                <div class="choice-label">ROCK</div>
+            </button>
+            <button class="choice-btn paper" id="paperBtn" data-choice="paper">
+                <i class="fas fa-hand-paper"></i>
+                <div class="choice-label">PAPER</div>
+            </button>
+            <button class="choice-btn scissors" id="scissorsBtn" data-choice="scissors">
+                <i class="fas fa-hand-scissors"></i>
+                <div class="choice-label">SCISSORS</div>
+            </button>
+        </section>
+        
+        <!-- Game Results -->
+        <section class="game-results">
+            <div class="choices-display">
+                <div class="choice-card">
+                    <div class="choice-icon" id="playerChoiceIcon">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div class="choice-name">Your Choice</div>
+                </div>
+                <div class="vs-text">VS</div>
+                <div class="choice-card">
+                    <div class="choice-icon" id="computerChoiceIcon">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div class="choice-name">Computer's Choice</div>
+                </div>
+            </div>
+            <div class="result-text" id="resultText">
+                Make your move to start the game!
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-success-custom btn-custom" id="playAgainBtn" style="display: none;">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button class="btn btn-danger-custom btn-custom" id="resetGameBtn">
+                    <i class="fas fa-trash-alt"></i> Reset Game
+                </button>
+            </div>
+        </section>
+        
+        <!-- Game History -->
+        <section class="game-history">
+            <h3 class="history-title"><i class="fas fa-history"></i> GAME HISTORY</h3>
+            <ul class="history-list" id="historyList">
+                <!-- History items will be added here -->
+                <li class="history-item">No games played yet. Make your first move!</li>
+            </ul>
+        </section>
+        
+        <!-- Install PWA Button -->
+        <button class="btn btn-success-custom btn-custom" id="installButton">
+            <i class="fas fa-download"></i> Install App
+        </button>
+        
+        <!-- Footer -->
+        <footer class="game-footer">
+            <p>Rock Paper Scissors PWA 2026| Made with <i class="fas fa-heart" style="color: #e74c3c;"></i>by Olayinka</p>
+            <p>This is a Progressive Web App - you can install it on your device!</p>
+        </footer>
+    </div>
+
+    <!-- How to Play Modal -->
+    <div class="modal fade" id="rulesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: #2c3e50; color: white;">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title"><i class="fas fa-info-circle"></i> How to Play Rock Paper Scissors</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Game Rules:</h6>
+                    <ul>
+                        <li><strong>Rock</strong> crushes Scissors</li>
+                        <li><strong>Paper</strong> covers Rock</li>
+                        <li><strong>Scissors</strong> cuts Paper</li>
+                    </ul>
+                    <p>If both players choose the same item, it's a tie.</p>
+                    <hr>
+                    <h6>How to Play:</h6>
+                    <ol>
+                        <li>Click on Rock, Paper, or Scissors to make your choice</li>
+                        <li>The computer will randomly choose its move</li>
+                        <li>The winner gets a point</li>
+                        <li>First to 10 points wins the game!</li>
+                    </ol>
+                    <hr>
+                    <h6>PWA Features:</h6>
+                    <p>This is a Progressive Web App (PWA) that can be installed on your device. Once installed, it will open like a native app without a browser interface.</p>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Game state
+        let playerScore = 0;
+        let computerScore = 0;
+        let gameHistory = [];
+        let soundEnabled = true;
+        let deferredPrompt;
+        
+        // DOM Elements
+        const playerScoreEl = document.getElementById('playerScore');
+        const computerScoreEl = document.getElementById('computerScore');
+        const playerScoreBox = document.getElementById('playerScoreBox');
+        const computerScoreBox = document.getElementById('computerScoreBox');
+        const resultTextEl = document.getElementById('resultText');
+        const playerChoiceIcon = document.getElementById('playerChoiceIcon');
+        const computerChoiceIcon = document.getElementById('computerChoiceIcon');
+        const historyList = document.getElementById('historyList');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const resetGameBtn = document.getElementById('resetGameBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const installButton = document.getElementById('installButton');
+        const pwaInstallInfo = document.getElementById('pwaInstallInfo');
+        
+        // Choice buttons
+        const rockBtn = document.getElementById('rockBtn');
+        const paperBtn = document.getElementById('paperBtn');
+        const scissorsBtn = document.getElementById('scissorsBtn');
+        
+        // Game sounds
+        const winSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+        const loseSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+        const drawSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+        const clickSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+        
+        // Create simple beep sounds
+        function createSounds() {
+            // Win sound (high pitch beep)
+            const winContext = new AudioContext();
+            const winOscillator = winContext.createOscillator();
+            const winGain = winContext.createGain();
+            winOscillator.connect(winGain);
+            winGain.connect(winContext.destination);
+            winOscillator.frequency.value = 800;
+            winGain.gain.value = 0.3;
+            winOscillator.start();
+            winGain.gain.exponentialRampToValueAtTime(0.001, winContext.currentTime + 0.5);
+            winOscillator.stop(winContext.currentTime + 0.5);
+            
+            // Lose sound (low pitch beep)
+            const loseContext = new AudioContext();
+            const loseOscillator = loseContext.createOscillator();
+            const loseGain = loseContext.createGain();
+            loseOscillator.connect(loseGain);
+            loseGain.connect(loseContext.destination);
+            loseOscillator.frequency.value = 300;
+            loseGain.gain.value = 0.3;
+            loseOscillator.start();
+            loseGain.gain.exponentialRampToValueAtTime(0.001, loseContext.currentTime + 0.5);
+            loseOscillator.stop(loseContext.currentTime + 0.5);
+            
+            // Draw sound (medium pitch beep)
+            const drawContext = new AudioContext();
+            const drawOscillator = drawContext.createOscillator();
+            const drawGain = drawContext.createGain();
+            drawOscillator.connect(drawGain);
+            drawGain.connect(drawContext.destination);
+            drawOscillator.frequency.value = 500;
+            drawGain.gain.value = 0.3;
+            drawOscillator.start();
+            drawGain.gain.exponentialRampToValueAtTime(0.001, drawContext.currentTime + 0.3);
+            drawOscillator.stop(drawContext.currentTime + 0.3);
+            
+            // Click sound (short beep)
+            const clickContext = new AudioContext();
+            const clickOscillator = clickContext.createOscillator();
+            const clickGain = clickContext.createGain();
+            clickOscillator.connect(clickGain);
+            clickGain.connect(clickContext.destination);
+            clickOscillator.frequency.value = 600;
+            clickGain.gain.value = 0.2;
+            clickOscillator.start();
+            clickGain.gain.exponentialRampToValueAtTime(0.001, clickContext.currentTime + 0.1);
+            clickOscillator.stop(clickContext.currentTime + 0.1);
+        }
+        
+        // Initialize game
+        function initGame() {
+            // Set up event listeners
+            rockBtn.addEventListener('click', () => playRound('rock'));
+            paperBtn.addEventListener('click', () => playRound('paper'));
+            scissorsBtn.addEventListener('click', () => playRound('scissors'));
+            playAgainBtn.addEventListener('click', resetRound);
+            resetGameBtn.addEventListener('click', resetGame);
+            soundToggle.addEventListener('click', toggleSound);
+            
+            // Bootstrap modal for rules
+            const rulesBtn = document.getElementById('rulesBtn');
+            rulesBtn.addEventListener('click', () => {
+                const rulesModal = new bootstrap.Modal(document.getElementById('rulesModal'));
+                rulesModal.show();
+            });
+            
+            // Create initial sounds
+            createSounds();
+            
+            // Initialize PWA
+            initPWA();
+            
+            // Show PWA install info on first visit
+            if (!localStorage.getItem('pwaInfoShown')) {
+                setTimeout(() => {
+                    pwaInstallInfo.classList.add('show');
+                    localStorage.setItem('pwaInfoShown', 'true');
+                }, 3000);
+            }
+            
+            updateDisplay();
+        }
+        
+        // Play a round
+        function playRound(playerChoice) {
+            // Play click sound
+            if (soundEnabled) {
+                createSounds(); // Recreate sounds for each click
+            }
+            
+            // Get computer choice
+            const computerChoice = getComputerChoice();
+            
+            // Determine winner
+            const result = determineWinner(playerChoice, computerChoice);
+            
+            // Update scores
+            if (result === 'win') {
+                playerScore++;
+                if (soundEnabled) createSounds(); // Win sound
+            } else if (result === 'lose') {
+                computerScore++;
+                if (soundEnabled) createSounds(); // Lose sound
+            } else {
+                if (soundEnabled) createSounds(); // Draw sound
+            }
+            
+            // Add to history
+            addToHistory(playerChoice, computerChoice, result);
+            
+            // Update display
+            updateDisplay(playerChoice, computerChoice, result);
+            
+            // Check for game winner
+            checkGameWinner();
+            
+            // Show play again button
+            playAgainBtn.style.display = 'inline-flex';
+        }
+        
+        // Get computer choice
+        function getComputerChoice() {
+            const choices = ['rock', 'paper', 'scissors'];
+            const randomIndex = Math.floor(Math.random() * 3);
+            return choices[randomIndex];
+        }
+        
+        // Determine winner
+        function determineWinner(player, computer) {
+            if (player === computer) return 'draw';
+            
+            if (
+                (player === 'rock' && computer === 'scissors') ||
+                (player === 'paper' && computer === 'rock') ||
+                (player === 'scissors' && computer === 'paper')
+            ) {
+                return 'win';
+            }
+            
+            return 'lose';
+        }
+        
+        // Update display
+        function updateDisplay(playerChoice, computerChoice, result) {
+            // Update scores
+            playerScoreEl.textContent = playerScore;
+            computerScoreEl.textContent = computerScore;
+            
+            // Update choice icons
+            if (playerChoice) {
+                playerChoiceIcon.innerHTML = getChoiceIcon(playerChoice);
+                computerChoiceIcon.innerHTML = getChoiceIcon(computerChoice);
+                
+                // Add pulse animation to result
+                resultTextEl.classList.add('pulse');
+                setTimeout(() => resultTextEl.classList.remove('pulse'), 500);
+            }
+            
+            // Update result text
+            if (result === 'win') {
+                resultTextEl.textContent = "You Win!";
+                resultTextEl.className = "result-text win";
+                playerScoreBox.classList.add('active');
+                computerScoreBox.classList.remove('active');
+            } else if (result === 'lose') {
+                resultTextEl.textContent = "Computer Wins!";
+                resultTextEl.className = "result-text lose";
+                computerScoreBox.classList.add('active');
+                playerScoreBox.classList.remove('active');
+            } else if (result === 'draw') {
+                resultTextEl.textContent = "It's a Draw!";
+                resultTextEl.className = "result-text draw";
+                playerScoreBox.classList.remove('active');
+                computerScoreBox.classList.remove('active');
+            } else {
+                resultTextEl.textContent = "Make your move to start the game!";
+                resultTextEl.className = "result-text";
+            }
+            
+            // Update history list
+            updateHistoryList();
+        }
+        
+        // Get icon for choice
+        function getChoiceIcon(choice) {
+            switch(choice) {
+                case 'rock':
+                    return '<i class="fas fa-hand-rock"></i>';
+                case 'paper':
+                    return '<i class="fas fa-hand-paper"></i>';
+                case 'scissors':
+                    return '<i class="fas fa-hand-scissors"></i>';
+                default:
+                    return '<i class="fas fa-question"></i>';
+            }
+        }
+        
+        // Add to history
+        function addToHistory(playerChoice, computerChoice, result) {
+            const historyEntry = {
+                player: playerChoice,
+                computer: computerChoice,
+                result: result,
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            gameHistory.unshift(historyEntry);
+            
+            // Keep only last 10 entries
+            if (gameHistory.length > 10) {
+                gameHistory.pop();
+            }
+        }
+        
+        // Update history list
+        function updateHistoryList() {
+            historyList.innerHTML = '';
+            
+            if (gameHistory.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.className = 'history-item';
+                emptyItem.textContent = 'No games played yet. Make your first move!';
+                historyList.appendChild(emptyItem);
+                return;
+            }
+            
+            gameHistory.forEach(entry => {
+                const historyItem = document.createElement('li');
+                historyItem.className = `history-item ${entry.result}`;
+                
+                const resultIcon = entry.result === 'win' ? '<i class="fas fa-trophy" style="color: #2ecc71;"></i>' :
+                                 entry.result === 'lose' ? '<i class="fas fa-times" style="color: #e74c3c;"></i>' :
+                                 '<i class="fas fa-equals" style="color: #f39c12;"></i>';
+                
+                const playerChoiceIcon = getChoiceIcon(entry.player);
+                const computerChoiceIcon = getChoiceIcon(entry.computer);
+                
+                historyItem.innerHTML = `
+                    <span>${playerChoiceIcon} ${entry.player.toUpperCase()}</span>
+                    <span>${resultIcon}</span>
+                    <span>${computerChoiceIcon} ${entry.computer.toUpperCase()}</span>
+                    <span>${entry.timestamp}</span>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Check for game winner
+        function checkGameWinner() {
+            if (playerScore >= 10) {
+                showGameOverMessage('You won the game! 🎉');
+                disableGameButtons();
+            } else if (computerScore >= 10) {
+                showGameOverMessage('Computer won the game! 😞');
+                disableGameButtons();
+            }
+        }
+        
+        // Show game over message
+        function showGameOverMessage(message) {
+            resultTextEl.textContent = message;
+            resultTextEl.classList.add('glow');
+            
+            // Create confetti effect for win
+            if (message.includes('You won')) {
+                createConfetti();
+            }
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '9999';
+                confetti.style.pointerEvents = 'none';
+                
+                document.body.appendChild(confetti);
+                
+                // Animation
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 10}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 1000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        // Disable game buttons
+        function disableGameButtons() {
+            rockBtn.disabled = true;
+            paperBtn.disabled = true;
+            scissorsBtn.disabled = true;
+            
+            rockBtn.style.opacity = '0.5';
+            paperBtn.style.opacity = '0.5';
+            scissorsBtn.style.opacity = '0.5';
+        }
+        
+        // Enable game buttons
+        function enableGameButtons() {
+            rockBtn.disabled = false;
+            paperBtn.disabled = false;
+            scissorsBtn.disabled = false;
+            
+            rockBtn.style.opacity = '1';
+            paperBtn.style.opacity = '1';
+            scissorsBtn.style.opacity = '1';
+        }
+        
+        // Reset round
+        function resetRound() {
+            playerChoiceIcon.innerHTML = '<i class="fas fa-question"></i>';
+            computerChoiceIcon.innerHTML = '<i class="fas fa-question"></i>';
+            resultTextEl.textContent = 'Make your move to start the game!';
+            resultTextEl.className = 'result-text';
+            resultTextEl.classList.remove('glow');
+            playAgainBtn.style.display = 'none';
+            enableGameButtons();
+        }
+        
+        // Reset game
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            gameHistory = [];
+            resetRound();
+            updateDisplay();
+            enableGameButtons();
+        }
+        
+        // Toggle sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = soundToggle.querySelector('i');
+            const text = soundToggle.querySelector('span');
+            
+            if (soundEnabled) {
+                icon.className = 'fas fa-volume-up';
+                text.textContent = 'Sound: ON';
+                soundToggle.classList.remove('btn-warning-custom');
+                soundToggle.classList.add('btn-warning-custom');
+            } else {
+                icon.className = 'fas fa-volume-mute';
+                text.textContent = 'Sound: OFF';
+                soundToggle.classList.remove('btn-warning-custom');
+                soundToggle.classList.add('btn-warning-custom');
+            }
+        }
+        
+        // PWA Installation
+        function initPWA() {
+            // Create and set the manifest
+            const manifest = {
+                "name": "Rock Paper Scissors PWA",
+                "short_name": "RPS Game",
+                "description": "A fun Rock Paper Scissors game that works offline",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#2c3e50",
+                "theme_color": "#3498db",
+                "orientation": "portrait-primary",
+                "icons": [
+                    {
+                        "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMTU5LjcgMjEwLjJsLTExMC4yIDk0LjFjLTE0LjMgMTIuMy0zNS42IDEwLjctNDcuOC0zLjZzLTEwLjctMzUuNiAzLjYtNDcuOGw2MS42LTUyLjggMzIuMy0yNy43YzE0LjMtMTIuMyAzNS42LTEwLjcgNDcuOCAzLjYgMTIuMyAxNC40IDEwLjcgMzUuNi0zLjYgNDcuOHptLTIxOS4zIDBjLTE0LjMtMTIuMy0xNS45LTMzLjYtMy42LTQ3LjggMTIuMy0xNC40IDMzLjYtMTUuOSA0Ny44LTMuNmwzMi4zIDI3LjcgNjEuNiA1Mi44YzE0LjMgMTIuMyAxNS45IDMzLjYgMy42IDQ3LjgtMTIuMiAxNC4zLTMzLjYgMTUuOS00Ny44IDMuNkwxOTYuNCAyMTguMnptMjU2IDc2LjJjLTM1LjMgMC02NC0yOC43LTY0LTY0czI4LjctNjQgNjQtNjQgNjQgMjguNyA2NCA2NC0yOC43IDY0LTY0IDY0eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==",
+                        "sizes": "512x512",
+                        "type": "image/svg+xml",
+                        "purpose": "any maskable"
+                    }
+                ]
+            };
+            
+            // Create manifest link
+            const manifestString = JSON.stringify(manifest);
+            const manifestBlob = new Blob([manifestString], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            
+            const manifestLink = document.getElementById('app-manifest');
+            manifestLink.href = manifestURL;
+            
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // Inline service worker
+                    const swContent = `
+                        self.addEventListener('install', (event) => {
+                            event.waitUntil(
+                                caches.open('rps-game-v1').then((cache) => {
+                                    return cache.addAll([
+                                        './',
+                                        './index.html'
+                                    ]);
+                                })
+                            );
+                        });
+                        
+                        self.addEventListener('fetch', (event) => {
+                            event.respondWith(
+                                caches.match(event.request).then((response) => {
+                                    return response || fetch(event.request);
+                                })
+                            );
+                        });
+                    `;
+                    
+                    const swBlob = new Blob([swContent], {type: 'application/javascript'});
+                    const swURL = URL.createObjectURL(swBlob);
+                    
+                    navigator.serviceWorker.register(swURL)
+                        .then(registration => {
+                            console.log('Service Worker registered with scope:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.log('Service Worker registration failed:', error);
+                        });
+                });
+            }
+            
+            // Handle PWA installation
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installButton.style.display = 'flex';
+                
+                installButton.addEventListener('click', () => {
+                    installButton.style.display = 'none';
+                    deferredPrompt.prompt();
+                    
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        } else {
+                            console.log('User dismissed the install prompt');
+                        }
+                        deferredPrompt = null;
+                    });
+                });
+            });
+            
+            // Track app installation
+            window.addEventListener('appinstalled', () => {
+                console.log('PWA was installed');
+                installButton.style.display = 'none';
+            });
+        }
+        
+        // Hide PWA info
+        function hidePWAInfo() {
+            pwaInstallInfo.classList.remove('show');
+        }
+        
+        // Initialize the game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
